@@ -31,20 +31,22 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.Turret;
-import frc.robot.subsystems.LED;
+//import frc.robot.subsystems.LED;
 import frc.robot.Constants.LED.AnimationType;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToPoseML;
 import frc.robot.commands.DriveToPoseStraight;
-import frc.robot.commands.ClimberCommands.ClimbDefault;
-import frc.robot.commands.ClimberCommands.GoToPosition;
+//import frc.robot.commands.ClimberCommands.ClimbDefault;
+//import frc.robot.commands.ClimberCommands.GoToPosition;
 import frc.robot.commands.FlywheelCommands.DefaultFlywheel;
 import frc.robot.commands.FlywheelCommands.SpeedToPassing;
+import frc.robot.commands.FlywheelCommands.SpeedToPassingAuto;
 import frc.robot.commands.FlywheelCommands.SpeedToSetpoint;
 import frc.robot.commands.FlywheelCommands.TurnToSpeed;
 import frc.robot.commands.HoodCommands.HoodDefault;
 import frc.robot.commands.HoodCommands.HoodToSetpoint;
 import frc.robot.commands.HoodCommands.RotateOnPassing;
+import frc.robot.commands.HoodCommands.RotateOnPassingAuto;
 import frc.robot.commands.HoodCommands.RotateToPosition;
 import frc.robot.commands.IntakeBeltCommands.IntakeDefault;
 import frc.robot.commands.IntakeBeltCommands.IntakeDown;
@@ -52,15 +54,17 @@ import frc.robot.commands.IntakeBeltCommands.IntakeStuff;
 import frc.robot.commands.IntakeBeltCommands.IntakeStuffAuto;
 import frc.robot.commands.IntakeBeltCommands.IntakeStuffRemake;
 import frc.robot.commands.IntakeBeltCommands.IntakeUp;
-import frc.robot.commands.LEDCommands.SetLEDs;
+//import frc.robot.commands.LEDCommands.SetLEDs;
 import frc.robot.commands.SpindexerCommands.SpinDefault;
 import frc.robot.commands.SpindexerCommands.spin2;
 import frc.robot.commands.TurretCommands.HomeTurret;
 import frc.robot.commands.TurretCommands.TurnToHub;
+import frc.robot.commands.TurretCommands.TurnToHubAuto;
 import frc.robot.commands.TurretCommands.TurnToPassing;
+import frc.robot.commands.TurretCommands.TurnToPassingAutomactic;
 import frc.robot.commands.TurretCommands.TurnToPosition;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Climber;
+//import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.IntakeBelt;
@@ -90,7 +94,7 @@ public class RobotContainer {
 
     public static Spindexer spindexer;
 
-    public static Climber climber;
+    //public static Climber climber;
 
     public static Flywheel flywheel;
 
@@ -100,7 +104,7 @@ public class RobotContainer {
 
     public static Turret turret;
 
-    public static LED led;
+    //public static LED led;
 
     public static boolean shooting;
 
@@ -139,11 +143,11 @@ public class RobotContainer {
                 new VisionIOLimelight("limelight-front", drive::getRotation));
         spindexer = new Spindexer();
         flywheel = new Flywheel();
-        climber = null;//new Climber();
+        //climber = null;//new Climber();
         hood = new Hood();
         intakeBelt = new IntakeBelt();
         turret = new Turret();
-        led = new LED();
+        //led = new LED();
        // intakeBelt = new IntakeBelt();
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -222,13 +226,14 @@ public class RobotContainer {
     // NamedCommands.registerCommand("Lower Climb", new GoToPosition(climber, 0));
     NamedCommands.registerCommand("simple", new TurnToSpeed(flywheel));
     //NamedCommands.registerCommand("Stop", new ParallelCommandGroup(new DefaultFlywheel(flywheel), new HoodDefault(hood), new SpinDefault(spindexer)));
-    NamedCommands.registerCommand("just turret", new TurnToHub(turret));
+    NamedCommands.registerCommand("just turret", new TurnToHubAuto(turret));
     NamedCommands.registerCommand("Shoot1", new ParallelCommandGroup(new TurnToSpeed(flywheel), new RotateToPosition(hood)));
-    NamedCommands.registerCommand("Shoot2", new TurnToHub(turret));
-    NamedCommands.registerCommand("Shoot3", new spin2(spindexer, true, false));
+    NamedCommands.registerCommand("Shoot2", new TurnToHubAuto(turret));
+    NamedCommands.registerCommand("Shoot3", new spin2(spindexer, true, true));
     NamedCommands.registerCommand("just hood", new RotateToPosition(hood));
     NamedCommands.registerCommand("intake", new IntakeStuffAuto(intakeBelt));
     NamedCommands.registerCommand("Stop Intake", new IntakeDefault(intakeBelt));
+    NamedCommands.registerCommand("intake up", new IntakeUp(intakeBelt));
 
   }
 
@@ -242,14 +247,15 @@ public class RobotContainer {
         intakeBelt.setDefaultCommand(new IntakeDefault(intakeBelt));
         spindexer.setDefaultCommand(new SpinDefault(spindexer));
         hood.setDefaultCommand(new HoodDefault(hood));
+        flywheel.setDefaultCommand(new DefaultFlywheel(flywheel));
       //  led.setDefaultCommand(new SetLEDs(led, AnimationType.Solid, AnimationType.ColorFlow));
 
         //opController.back().toggleOnTrue(new SetLEDs(led, AnimationType.Rainbow, AnimationType.SingleFade));
 
-        opController.y().toggleOnTrue(new ParallelCommandGroup(new SetLEDs(led, AnimationType.Rainbow, AnimationType.Rainbow), new TurnToHub(turret), new RotateToPosition(hood), new TurnToSpeed(flywheel)));
-        opController.x().toggleOnTrue(new ParallelCommandGroup(new SetLEDs(led, AnimationType.Fire, AnimationType.Fire), new TurnToPassing(turret, true) /*, new RotateOnPassing(hood, true), new SpeedToPassing(flywheel, true)*/));
-        opController.b().toggleOnTrue(new ParallelCommandGroup(new SetLEDs(led, AnimationType.Fire, AnimationType.Fire), new TurnToPassing(turret, false) /*, new RotateOnPassing(hood, false), new SpeedToPassing(flywheel, false)*/));
-        opController.a().toggleOnTrue(new HomeTurret(turret));
+        opController.y().toggleOnTrue(new ParallelCommandGroup(new TurnToHub(turret), new RotateToPosition(hood), new TurnToSpeed(flywheel)));
+        opController.x().toggleOnTrue(new ParallelCommandGroup(new TurnToPassing(turret, true), new RotateOnPassing(hood, true), new SpeedToPassing(flywheel, true)));
+        opController.b().toggleOnTrue(new ParallelCommandGroup(new TurnToPassing(turret, false), new RotateOnPassing(hood, false), new SpeedToPassing(flywheel, false)));
+        opController.a().toggleOnTrue(new ParallelCommandGroup(new TurnToPassingAutomactic(turret), new RotateOnPassingAuto(hood), new SpeedToPassingAuto(flywheel)));
 
         opController.leftTrigger().toggleOnTrue(new spin2(spindexer, false, true));
         opController.rightTrigger().toggleOnTrue(new spin2(spindexer, true, false));
@@ -257,17 +263,34 @@ public class RobotContainer {
         opController.leftBumper().toggleOnTrue(new IntakeStuff(intakeBelt, false));
         opController.rightBumper().toggleOnTrue(new IntakeStuffAuto(intakeBelt));
 
-        opController.pov(90).toggleOnTrue(new IntakeUp(intakeBelt));        
+
+        opController.povDown().toggleOnTrue(new ParallelCommandGroup(new TurnToPosition(turret, 0.37255859375),new SpeedToSetpoint(flywheel, flywheel.flywheelInterpNumber.getAsDouble()),  new HoodToSetpoint(hood, hood.HOOD_INTERP_POS.getAsDouble())));
+        //opController.povLeft().toggleOnTrue(new TurnToPosition(turret, 0.37255859375));
+        //opController.povUp().toggleOnTrue(new SpeedToSetpoint(flywheel, flywheel.flywheelInterpNumber.getAsDouble()));
+        //opController.povRight().toggleOnTrue(new HoodToSetpoint(hood, hood.HOOD_INTERP_POS.getAsDouble()));
+    //    opController.pov(90).toggleOnTrue(new IntakeUp(intakeBelt));        
 
         //NEED TO COMPLETE SETPOINTS
      //   opController.pov(0).toggleOnTrue(new ParallelCommandGroup(new TurnToHub(turret), new HoodToSetpoint(hood, 0.12639097555576206), new SpeedToSetpoint(flywheel, -40.45454095621027)));     
-        opController.pov(180).toggleOnTrue(new IntakeDown(intakeBelt));
+    //    opController.pov(180).toggleOnTrue(new IntakeDown(intakeBelt));
 
         //TESTING ONLY COMMANDS
-     //   opController.pov(90).toggleOnTrue(new ParallelCommandGroup(new TurnToPosition(turret, 0.25), new HoodToSetpoint(hood, 0.25), new SpeedToSetpoint(flywheel, -38.0))); //TESTING
+        /* 
+        //Left Long
+        opController.povLeft().toggleOnTrue(new ParallelCommandGroup(new TurnToPassing(turret, true), new HoodToSetpoint(hood, 1.0), new SpeedToSetpoint(flywheel, -79.5)));
+        //Left short
+        opController.povUp().toggleOnTrue(new ParallelCommandGroup(new TurnToPassing(turret, true), new HoodToSetpoint(hood, 1.15), new SpeedToSetpoint(flywheel, -65.5)));
+
+        //right long
+        opController.povRight().toggleOnTrue(new ParallelCommandGroup(new TurnToPassing(turret, false), new HoodToSetpoint(hood, 1.0), new SpeedToSetpoint(flywheel, -79.5)));
+
+        //right short
+        opController.povDown().toggleOnTrue(new ParallelCommandGroup(new TurnToPassing(turret, false), new HoodToSetpoint(hood, 1.15), new SpeedToSetpoint(flywheel, -65.5)));
+        */
+        //opController.povLeft().toggleOnTrue(new ParallelCommandGroup(new TurnToPosition(turret, 0.03), new HoodToSetpoint(hood, 1.6), new SpeedToSetpoint(flywheel, -20.0))); //TESTING
      //   opController.pov(270).toggleOnTrue(new ParallelCommandGroup(new TurnToPosition(turret, 0.40), new HoodToSetpoint(hood, 0.7), new SpeedToSetpoint(flywheel, -45.0))); //TESTING        
-        opController.povLeft().toggleOnTrue(new IntakeStuffRemake(intakeBelt, true));
-        opController.povUp().toggleOnTrue(new IntakeUp(intakeBelt));
+        //opController.povLeft().toggleOnTrue(new IntakeStuffRemake(intakeBelt, true));
+        //opController.povUp().toggleOnTrue(new IntakeUp(intakeBelt));
 //     //opController.back().toggleOnTrue(new RotateToPosition(hood, 0.3));
 //     opController.leftStick().toggleOnTrue(new spin2(spindexer, false, true));
 //     opController.pov(0).toggleOnTrue(new IntakeStuff(intakeBelt, true));
@@ -339,8 +362,9 @@ public class RobotContainer {
                         new Translation2d(
                             DriverStation.getAlliance().get() == Alliance.Blue ? 2.815 : 16.54 - 2.185, 5.611), 
                         new Rotation2d(Units.degreesToRadians(
-                            DriverStation.getAlliance().get() == Alliance.Blue ? -40 : 40)))),
-                new SetLEDs(led, AnimationType.Strobe, AnimationType.Strobe)));
+                            DriverStation.getAlliance().get() == Alliance.Blue ? -40 : 40))))
+                //new SetLEDs(led, AnimationType.Strobe, AnimationType.Strobe
+                ));
 
 
     controller
@@ -348,16 +372,18 @@ public class RobotContainer {
         .toggleOnTrue(
             new ParallelCommandGroup(
                 new DriveToPoseStraight(
-                    drive, new Pose2d(new Translation2d(DriverStation.getAlliance().get() == Alliance.Blue ? 2.266 : 16.54 - 2.266, 3.847), new Rotation2d(DriverStation.getAlliance().get() == Alliance.Blue ? Units.degreesToRadians(0) : Units.degreesToRadians(180)))),
-                new SetLEDs(led, AnimationType.Strobe, AnimationType.Strobe)));
+                    drive, new Pose2d(new Translation2d(DriverStation.getAlliance().get() == Alliance.Blue ? 2.266 : 16.54 - 2.266, 3.847), new Rotation2d(DriverStation.getAlliance().get() == Alliance.Blue ? Units.degreesToRadians(0) : Units.degreesToRadians(180))))
+                //new SetLEDs(led, AnimationType.Strobe, AnimationType.Strobe)
+                ));
 
     controller
         .povRight()
         .toggleOnTrue(
             new ParallelCommandGroup(
                 new DriveToPoseStraight(
-                    drive, new Pose2d(new Translation2d(DriverStation.getAlliance().get() == Alliance.Blue ? 2.966 : 16.54 - 2.966, 2.168), new Rotation2d(DriverStation.getAlliance().get() == Alliance.Blue ? Units.degreesToRadians(50) : Units.degreesToRadians(50)))),
-            new SetLEDs(led, AnimationType.Strobe, AnimationType.Strobe)));
+                    drive, new Pose2d(new Translation2d(DriverStation.getAlliance().get() == Alliance.Blue ? 2.966 : 16.54 - 2.966, 2.168), new Rotation2d(DriverStation.getAlliance().get() == Alliance.Blue ? Units.degreesToRadians(50) : Units.degreesToRadians(50))))
+            //new SetLEDs(led, AnimationType.Strobe, AnimationType.Strobe)
+            ));
 
                 
 
@@ -391,6 +417,79 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+   return autoChooser.get();
+ //  return 
   }
 }
+
+
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 
+// I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN I AM FADING ALEX MASIN 

@@ -11,9 +11,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "aravBlueLeft"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "aravBlueLeft"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intake"
+                }
+              }
+            ]
           }
         },
         {
@@ -91,6 +104,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of aravBlueLeft"
           }
         },
         {

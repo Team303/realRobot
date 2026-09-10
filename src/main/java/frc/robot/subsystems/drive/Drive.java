@@ -56,6 +56,8 @@ import frc.robot.commands.TurretCommands.TurnToHub;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.LoggedTunableNumber;
+
+import java.time.chrono.IsoChronology;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -121,6 +123,9 @@ public class Drive extends SubsystemBase {
   public static InterpolatingDoubleTreeMap flywheelSpeeds;
   public static InterpolatingDoubleTreeMap timeOfFlight;
 
+  public static InterpolatingDoubleTreeMap hoodAnglesPASSING;
+  public static InterpolatingDoubleTreeMap flywheelSpeedsPASSING;
+
 
 
   private static LoggedNetworkNumber distanceLogged;
@@ -178,6 +183,8 @@ public class Drive extends SubsystemBase {
         flywheelSpeeds = new InterpolatingDoubleTreeMap();
         hoodAngles = new InterpolatingDoubleTreeMap();
         timeOfFlight = new InterpolatingDoubleTreeMap();
+        flywheelSpeedsPASSING = new InterpolatingDoubleTreeMap();
+        hoodAnglesPASSING = new InterpolatingDoubleTreeMap();
         //Distance and Angle
         // hoodAngles.put(3.7338, 0.48);
         // hoodAngles.put(4.1148, 0.6 - 0.015);  
@@ -289,6 +296,41 @@ public class Drive extends SubsystemBase {
         flywheelSpeeds.put(4.662327337938311, -46.50);
         flywheelSpeeds.put(4.869053261867801, -47.5);
       //  flywheelSpeeds.put(5.25, 0.0);
+        
+        
+      //Theortical Passing ones
+      //hoodAnglesPASSING.put(5.5, 1.05);
+      hoodAnglesPASSING.put(6.0, 0.9);
+      hoodAnglesPASSING.put(6.5, 0.9);
+      hoodAnglesPASSING.put(7.0, 0.9);
+      hoodAnglesPASSING.put(7.5, 0.9);
+      hoodAnglesPASSING.put(8.0, 0.91);
+      hoodAnglesPASSING.put(8.5, 0.92);
+      hoodAnglesPASSING.put(9.0, 0.92);
+      hoodAnglesPASSING.put(9.5, 0.92);
+      hoodAnglesPASSING.put(10.0, 0.92);
+      hoodAnglesPASSING.put(10.5,0.92);
+      hoodAnglesPASSING.put(11.0, 0.9);//this and next two with full battery values
+      hoodAnglesPASSING.put(11.5, 0.9);
+      hoodAnglesPASSING.put(12.0, 0.9);
+      //hoodAnglesPASSING.put(14.5, 1.0);
+      
+      //Theortical Passing ones
+      //][\flywheelSpeedsPASSING.put(5.5, -50.5 - 1);
+      flywheelSpeedsPASSING.put(6.0, -48.3);
+      flywheelSpeedsPASSING.put(6.5, -49.7);
+      flywheelSpeedsPASSING.put(7.0, -51.3);
+      flywheelSpeedsPASSING.put(7.5, -54.67);
+      flywheelSpeedsPASSING.put(8.0, -58.34);
+      flywheelSpeedsPASSING.put(8.5, -60.12);
+      flywheelSpeedsPASSING.put(9.0, -62.22);
+      flywheelSpeedsPASSING.put(9.5, -72.22);
+      flywheelSpeedsPASSING.put(10.0, -75.22);
+      flywheelSpeedsPASSING.put(10.5, -75.22);
+      flywheelSpeedsPASSING.put(11.0, -75.0);//this one and next two are with full battery values idk
+      flywheelSpeedsPASSING.put(11.5, -77.0);
+      flywheelSpeedsPASSING.put(12.0, -80.0);
+      //flywheelSpeedsPASSING.put(14.5, -74.5);
 
       timeOfFlight.put(2.6017, 1.01);
       timeOfFlight.put(1.9418,0.94);
@@ -496,58 +538,81 @@ public class Drive extends SubsystemBase {
       return flywheelSpeeds.get(distance);
     }
 
-    public Pose2d whoKnows() {
-      // Calculate estimated pose while accounting for phase delay
-      Pose2d estimatedPose = getPose();
-      estimatedPose =
-          estimatedPose.exp(
-              new Twist2d(
-                  getChassisSpeeds().vxMetersPerSecond * 0.03,
-                  getChassisSpeeds().vyMetersPerSecond * 0.03,
-                  getChassisSpeeds().omegaRadiansPerSecond * 0.03));
+   public Pose2d whoKnows() {
+    // Step 1: Latency-compensated robot pose
+    Pose2d estimatedPose = getPose().exp(
+        new Twist2d(
+            getChassisSpeeds().vxMetersPerSecond * 0.03,
+            getChassisSpeeds().vyMetersPerSecond * 0.03,
+            getChassisSpeeds().omegaRadiansPerSecond * 0.03
+        )
+    );
 
-        // Calculate distance from turret to target
-      Translation2d target = new Translation2d(BLUE_HUB_X, BLUE_HUB_Y);
-      Translation2d robotToTurret = new Translation2d(Constants.Shooter.Turret.OFFSET_POS_X, Constants.Shooter.Turret.OFFSET_POS_Y).rotateAround(getPose().getTranslation(), getPose().getRotation());//, new Rotation2d(0);
-      Pose2d turretPosition = getPose().plus(new Transform2d(robotToTurret, new Rotation2d()));
-      double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
+    // Step 2: Turret pose using proper transform
+    Transform2d robotToTurret = new Transform2d(
+        new Translation2d(
+            Constants.Shooter.Turret.OFFSET_POS_X,
+            Constants.Shooter.Turret.OFFSET_POS_Y
+        ),
+        new Rotation2d()
+    );
 
-      // Calculate field relative turret velocity
-      double robotAngle = estimatedPose.getRotation().getRadians();
-      double turretVelocityX =
-          getChassisSpeeds().vxMetersPerSecond
-              + getChassisSpeeds().omegaRadiansPerSecond
-                  * (robotToTurret.getY() * Math.cos(robotAngle)
-                      - robotToTurret.getX() * Math.sin(robotAngle));
-      double turretVelocityY =
-          getChassisSpeeds().vyMetersPerSecond
-              + getChassisSpeeds().omegaRadiansPerSecond
-                  * (robotToTurret.getX() * Math.cos(robotAngle)
-                      - robotToTurret.getY() * Math.sin(robotAngle));
+    Pose2d turretPose = estimatedPose.plus(robotToTurret);
 
-      // Account for imparted velocity by robot (turret) to offset
-      double timeOfFlightVal;
-      Pose2d lookaheadPose = turretPosition;
-      double lookaheadTurretToTargetDistance = turretToTargetDistance;
-      for (int i = 0; i < 20; i++) {
-        timeOfFlightVal = timeOfFlight.get(lookaheadTurretToTargetDistance);
-        double offsetX = turretVelocityX * timeOfFlightVal;
-        double offsetY = turretVelocityY * timeOfFlightVal;
-        lookaheadPose =
-            new Pose2d(
-                turretPosition.getTranslation().plus(new Translation2d(offsetX, offsetY)),
-                turretPosition.getRotation());
-        lookaheadTurretToTargetDistance = target.getDistance(lookaheadPose.getTranslation());
-      }
+    // Step 3: Target position
+    Translation2d target = new Translation2d(BLUE_HUB_X, BLUE_HUB_Y);
 
+    double turretToTargetDistance = target.getDistance(turretPose.getTranslation());
 
-      Logger.recordOutput("LaunchCalculator/LookaheadPose", lookaheadPose);
-      Logger.recordOutput("LaunchCalculator/TurretToTargetDistance", lookaheadTurretToTargetDistance);
+    // Step 4: Turret velocity (field-relative)
+    double robotAngle = estimatedPose.getRotation().getRadians();
 
+    Translation2d robotToTurretTranslation = robotToTurret.getTranslation();
 
-      // Calculate parameters accounted for imparted velocity
-      return lookaheadPose;
+    double turretVelocityX =
+        getChassisSpeeds().vxMetersPerSecond
+            - getChassisSpeeds().omegaRadiansPerSecond
+                * robotToTurretTranslation.getY();
+
+    double turretVelocityY =
+        getChassisSpeeds().vyMetersPerSecond
+            + getChassisSpeeds().omegaRadiansPerSecond
+                * robotToTurretTranslation.getX();
+
+    // Rotate velocity into field frame
+    double fieldVx =
+        turretVelocityX * Math.cos(robotAngle)
+            - turretVelocityY * Math.sin(robotAngle);
+
+    double fieldVy =
+        turretVelocityX * Math.sin(robotAngle)
+            + turretVelocityY * Math.cos(robotAngle);
+
+    // Step 5: Iterative lookahead
+    Pose2d lookaheadPose = turretPose;
+    double lookaheadDistance = turretToTargetDistance;
+
+    for (int i = 0; i < 20; i++) {
+        double timeOfFlightVal = timeOfFlight.get(lookaheadDistance);
+
+        Translation2d offset = new Translation2d(
+            fieldVx * timeOfFlightVal,
+            fieldVy * timeOfFlightVal
+        );
+
+        lookaheadPose = new Pose2d(
+            turretPose.getTranslation().plus(offset),
+            turretPose.getRotation()
+        );
+
+        lookaheadDistance = target.getDistance(lookaheadPose.getTranslation());
     }
+
+    Logger.recordOutput("LaunchCalculator/LookaheadPose", lookaheadPose);
+    Logger.recordOutput("LaunchCalculator/TurretToTargetDistance", lookaheadDistance);
+
+    return lookaheadPose;
+}
     
 
    
@@ -579,6 +644,7 @@ public class Drive extends SubsystemBase {
       }
       dist = distance;
       distanceLogged.set(distance);
+      if (distance > 5.5) return flywheelSpeedsPASSING.get(distance);
       return flywheelSpeeds.get(distance);
     }
 
@@ -592,8 +658,32 @@ public class Drive extends SubsystemBase {
         distance = DriverStation.getAlliance().get() == DriverStation.Alliance.Blue ? Math.sqrt(Math.pow((currentPose.getX() - BLUE_PASSING_RIGHT_X), 2) + Math.pow((currentPose.getY() - BLUE_PASSING_RIGHT_Y), 2)) : Math.sqrt(Math.pow((currentPose.getX() - RED_PASSING_RIGHT_X), 2) + Math.pow((currentPose.getY() - RED_PASSING_RIGHT_Y), 2));
       }
       distanceLogged.set(distance);
+      if (distance > 5.5) return hoodAnglesPASSING.get(distance);
       return hoodAngles.get(distance);
     }
+
+    public int getPassingSide() {
+    //Return 1 means left side
+    //Return 0 means right side
+    //Return -1 means middle
+    double robotYPos = getPose().getY();
+    if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+      //Red
+      if (robotYPos >= 0.0 && robotYPos <= 3.5) {
+        return 1;
+      } else if (robotYPos >= 4.7 && robotYPos <= 8.1) {
+        return 0;
+      }
+    } else {
+      //Blue 
+      if (robotYPos >= 0.0 && robotYPos <= 3.5) {
+        return 0;
+      } else if (robotYPos >= 4.7 && robotYPos <= 8.1) {
+        return 1;
+      }
+    }
+    return -1;
+  }
 
   public boolean fuelInVision() {
     return (taSubscriber.get() > 0.5 && txSubscriber.get() != 0 && tySubscriber.get() != 0);

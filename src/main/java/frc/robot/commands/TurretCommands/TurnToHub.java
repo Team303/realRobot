@@ -48,7 +48,7 @@ public class TurnToHub extends Command {
     System.out.println("GOAL: " + goal + "; END: " + turret.getMotorPosition() + "; DIFF deg" + Math.abs(goal - turret.getMotorPosition()) * 360);
   }
 
-  @Override
+  @Override 
   public boolean isFinished() {
     return false;//Math.abs(turret.getMotorPosition()) > Constants.Shooter.Turret.HARD_MAX_TURRET_ROTATION;
     //return false;//Math.abs(goal - turret.getMotorPosition()) < GOAL_THRESHOLD;

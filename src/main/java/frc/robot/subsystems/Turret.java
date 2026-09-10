@@ -61,15 +61,15 @@ public class Turret extends SubsystemBase {
   private static final double RED_HUB_X = 11.91358;
   private static final double RED_HUB_Y = 4.03;
 
-  private static final double BLUE_PASSING_LEFT_X = 2.011;
-  private static final double BLUE_PASSING_LEFT_Y = 6.5;
-  private static final double BLUE_PASSING_RIGHT_X = 2.011;
-  private static final double BLUE_PASSING_RIGHT_Y = 1.877;
+  private static final double BLUE_PASSING_LEFT_X = 3.063;
+  private static final double BLUE_PASSING_LEFT_Y = 5.85;
+  private static final double BLUE_PASSING_RIGHT_X = 3.063;
+  private static final double BLUE_PASSING_RIGHT_Y = 2.15;
 
-  private static final double RED_PASSING_LEFT_X = 14.670;
-  private static final double RED_PASSING_LEFT_Y = 1.429;
+  private static final double RED_PASSING_LEFT_X = 13.500;
+  private static final double RED_PASSING_LEFT_Y = 5.85;
   private static final double RED_PASSING_RIGHT_X = 14.670;
-  private static final double RED_PASSING_RIGHT_Y = 6.5;
+  private static final double RED_PASSING_RIGHT_Y = 2.15;
 
   public enum ALLIANCE_SHIFT {
     BLUE,
@@ -137,8 +137,8 @@ public class Turret extends SubsystemBase {
     var motorTalonFXConfigurator = turretMotor.getConfigurator();
 
     var limitConfigs = new CurrentLimitsConfigs();
-    limitConfigs.StatorCurrentLimit = 60;
-    limitConfigs.SupplyCurrentLimit = 60;
+    limitConfigs.StatorCurrentLimit = 30;
+    limitConfigs.SupplyCurrentLimit = 30;
     limitConfigs.StatorCurrentLimitEnable = true;
     limitConfigs.SupplyCurrentLimitEnable = true;
     motorTalonFXConfigurator.apply(limitConfigs);
@@ -164,7 +164,7 @@ public class Turret extends SubsystemBase {
       turretMotor.setControl(mmRequest.withPosition(pos));
     } else {
       double newPos = 0.0;
-      if (pos - 0.24 > 0) {
+      if (pos - (Constants.Shooter.Turret.MAX_TURRET_ROTATION / 2.0) > 0) {
         newPos = Constants.Shooter.Turret.MAX_TURRET_ROTATION;
       } else {
         newPos = 0.0;
@@ -183,11 +183,15 @@ public class Turret extends SubsystemBase {
     double yDIFF = (BLUE_PASSING_LEFT_Y) - curPose.getY();
     double radiansRotate = -Math.atan(yDIFF / xDIFF);
 
-    double finalRadiansRotate = radiansRotate + curPose.getRotation().getRadians();
-    double finalAngleRotate = Math.toDegrees(finalRadiansRotate);
+    double finalRadiansRotate = 0.0;
 
-    Logger.recordOutput("angle of rotation", (finalAngleRotate - 45) / 360.0);
-    System.out.println(curPose.toString());
+    if (curPose.getRotation().getRadians() < 0) {
+      finalRadiansRotate = radiansRotate + (2 * Math.PI) + curPose.getRotation().getRadians();
+    } else {
+      finalRadiansRotate = radiansRotate + curPose.getRotation().getRadians();
+    }
+    double finalAngleRotate = Math.toDegrees(finalRadiansRotate);
+    
     return (finalAngleRotate - 45);// * (0.46/0.5);
   }
 
@@ -196,9 +200,16 @@ public class Turret extends SubsystemBase {
     double yDIFF = (BLUE_PASSING_RIGHT_Y) - curPose.getY();
     double radiansRotate = -Math.atan(yDIFF / xDIFF);
 
-    double finalRadiansRotate = radiansRotate + curPose.getRotation().getRadians();
+    double finalRadiansRotate = 0.0;
+
+    if (curPose.getRotation().getRadians() < 0) {
+      finalRadiansRotate = radiansRotate + (2 * Math.PI) + curPose.getRotation().getRadians();
+    } else {
+      finalRadiansRotate = radiansRotate + curPose.getRotation().getRadians();
+    }
     double finalAngleRotate = Math.toDegrees(finalRadiansRotate);
-    return (finalAngleRotate - 45);// * (0.46/0.5);
+
+    return (finalAngleRotate - 45);
   }
 
   private double getRedPassingLeftRotate(Pose2d curPose) {
@@ -209,7 +220,6 @@ public class Turret extends SubsystemBase {
     double finalRadiansRotate = radiansRotate + curPose.getRotation().getRadians();
     double finalAngleRotate = Math.toDegrees(finalRadiansRotate);
 
-    Logger.recordOutput("angle of rotation", finalAngleRotate);
     return (finalAngleRotate + 135);// * (0.46/0.5);
   }
 
@@ -221,6 +231,29 @@ public class Turret extends SubsystemBase {
     double finalRadiansRotate = radiansRotate + curPose.getRotation().getRadians();
     double finalAngleRotate = Math.toDegrees(finalRadiansRotate);
     return (finalAngleRotate + 135);// * (0.46/0.5);
+  }
+
+  public int getPassingSide() {
+    //Return 1 means left side
+    //Return 0 means right side
+    //Return -1 means middle
+    double robotYPos = drive.getPose().getY();
+    if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+      //Red
+      if (robotYPos >= 0.0 && robotYPos <= 3.8) {
+        return 1;
+      } else if (robotYPos >= 4.2 && robotYPos <= 8.1) {
+        return 0;
+      }
+    } else {
+      //Blue 
+      if (robotYPos >= 0.0 && robotYPos <= 3.8) {
+        return 0;
+      } else if (robotYPos >= 4.2 && robotYPos <= 8.1) {
+        return 1;
+      }
+    }
+    return -1;
   }
 
   private double normalizeRedRot(double input) {

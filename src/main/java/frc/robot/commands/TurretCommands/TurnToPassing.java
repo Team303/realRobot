@@ -33,7 +33,7 @@ public class TurnToPassing extends Command {
 
    // System.out.println("Rot goal: " + goal + " | Angle Goal: " + -turret.getTurretTurnPos());
     turret.moveToPos(goal);
-    System.out.println("GOAL: " + goal + "; END: " + turret.getMotorPosition() + "; DIFF" + Math.abs(goal - turret.getMotorPosition() * 360));
+    //System.out.println("GOAL: " + goal + "; END: " + turret.getMotorPosition() + "; DIFF" + Math.abs(goal - turret.getMotorPosition() * 360));
   }
 
   @Override

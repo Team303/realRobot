@@ -15,7 +15,7 @@ public class IntakeUp extends Command{
     }
 
    public void execute(){
-        take.takeMotor.set(0.5);
+        take.takeMotor.set(0.25);
         take.beltMotor.set(-0.5);
     }
 }

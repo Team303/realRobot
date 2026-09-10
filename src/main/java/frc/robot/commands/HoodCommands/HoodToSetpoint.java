@@ -30,7 +30,7 @@ public class HoodToSetpoint extends Command {
   public void execute() {
   //System.out.println("hood goal: " + goal);
   hood.hoodFoundPos.set(goal);
-  //goal = HOOD_INTERP_POS.getAsDouble();
+  goal = HOOD_INTERP_POS.getAsDouble();
   // goal = 0.485;
     System.out.println("hood goal: " + goal);
     hood.moveToPos(goal);

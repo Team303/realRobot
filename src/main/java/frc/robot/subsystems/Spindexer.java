@@ -41,10 +41,10 @@ public class Spindexer extends SubsystemBase{
     spindexerMotorConfigs.NeutralMode = NeutralModeValue.Brake;
 
     // enable stator current limit
-    limitConfigs.StatorCurrentLimit = 80;
+    limitConfigs.StatorCurrentLimit = 120;
     limitConfigs.StatorCurrentLimitEnable = true;
 
-    limitConfigs.SupplyCurrentLimit = 80;
+    limitConfigs.SupplyCurrentLimit = 120;
     limitConfigs.SupplyCurrentLimitEnable = true;
 
     SpindexerMotorTalonFXConfigurator.apply(spindexerMotorConfigs);

@@ -115,6 +115,8 @@ public class ModuleIOTalonFX implements ModuleIO {
     tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
     tryUntilOk(5, () -> driveTalon.setPosition(0.0, 0.25));
 
+    driveConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.01;
+
     // Configure turn motor
     var turnConfig = new TalonFXConfiguration();
     turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;

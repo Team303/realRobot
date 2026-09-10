@@ -90,8 +90,8 @@ public class Hood extends SubsystemBase{
         var motorTalonFXConfigurator = hoodMotor.getConfigurator();
 
         var limitConfigs = new CurrentLimitsConfigs();
-        limitConfigs.StatorCurrentLimit = 60;
-        limitConfigs.SupplyCurrentLimit = 60;
+        limitConfigs.StatorCurrentLimit = 20;
+        limitConfigs.SupplyCurrentLimit = 20;
         limitConfigs.StatorCurrentLimitEnable = true;
         limitConfigs.SupplyCurrentLimitEnable = true;
         motorTalonFXConfigurator.apply(limitConfigs);
@@ -108,14 +108,25 @@ public class Hood extends SubsystemBase{
         hoodFoundPos = new LoggedNetworkNumber("Hood Found Pos", 0.0);
         hoodAngles = new InterpolatingDoubleTreeMap();
         //Distance and Angle
-        hoodAngles.put(3.7338, 0.48);
-        hoodAngles.put(4.1148, 0.6);  
-        hoodAngles.put(2.4638, 0.2);  
-        hoodAngles.put(3.2766, 0.35);
-        hoodAngles.put(4.4196, 0.65);  
-        hoodAngles.put(4.9550, 1.0);
         hoodAngles.put(1.6002, 0.0);
         hoodAngles.put(2.3876, 0.1);
+        hoodAngles.put(2.4638, 0.2); 
+        hoodAngles.put(3.2766, 0.35);
+        hoodAngles.put(3.7338, 0.48);
+        hoodAngles.put(4.1148, 0.6); 
+        hoodAngles.put(4.4196, 0.65);  
+        hoodAngles.put(4.9550, 1.0);
+        
+        
+        //Theortical Passing ones
+        hoodAngles.put(5.5, 1.05);
+        hoodAngles.put(6.0, 1.15);
+        hoodAngles.put(6.5, 1.2);
+        hoodAngles.put(7.0, 1.2);
+        hoodAngles.put(7.5, 1.2);
+        hoodAngles.put(8.0, 1.2);
+        hoodAngles.put(8.5, 1.2);
+        hoodAngles.put(9.0, 1.2);
 
     }   
 

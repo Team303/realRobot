@@ -26,10 +26,10 @@ public class SpeedToSetpoint extends Command {
 
   @Override
   public void execute() {
-    RobotContainer.shooting = true; 
+    RobotContainer.shooting = false; 
     flywheel.flywheelInterpNumber.set(goal_speed);
     // goal_speed = -41.5;
-    //goal_speed = FLYWHEEL_INTERP_GOAL.getAsDouble();
+    goal_speed = FLYWHEEL_INTERP_GOAL.getAsDouble();
     //System.out.println("goal_speed: " + goal_speed);
      flywheel.getToSpeed(goal_speed); //2520 - 6
     //flywheel.rightFlywheelMotor.setVoltage(6);

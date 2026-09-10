@@ -19,6 +19,7 @@ public class IntakeStuff extends Command {
         
     }
     public void execute(){
+       
         if (forward) {
             intakeBelt.beltMotor.set(-0.50);
         }

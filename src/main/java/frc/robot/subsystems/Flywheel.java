@@ -96,7 +96,13 @@ public class Flywheel extends SubsystemBase {
         limitConfigs.SupplyCurrentLimitEnable = true;
         leftFlywheelMotor.getConfigurator().apply(limitConfigs);
         rightFlywheelMotor.getConfigurator().apply(limitConfigs);
-        kickerMotor.getConfigurator().apply(limitConfigs);
+
+        var limitConfigs2 = new CurrentLimitsConfigs();
+        limitConfigs2.StatorCurrentLimit = 120;
+        limitConfigs2.SupplyCurrentLimit = 120;
+        limitConfigs2.StatorCurrentLimitEnable = true;
+        limitConfigs2.SupplyCurrentLimitEnable = true;
+        kickerMotor.getConfigurator().apply(limitConfigs2);
 
         var leftMotorConfigs = new MotorOutputConfigs();
         leftMotorConfigs.NeutralMode = NeutralModeValue.Brake;
@@ -122,15 +128,26 @@ public class Flywheel extends SubsystemBase {
 
         flywheelSpeeds = new InterpolatingDoubleTreeMap();
         //Distance and Speed
-
-        flywheelSpeeds.put(3.7338, -39.75);
-        flywheelSpeeds.put(4.1148, -41.5);  
-        flywheelSpeeds.put(2.4638, -34.0);  
-        flywheelSpeeds.put(3.2766, -37.0);
-        flywheelSpeeds.put(4.4196, -42.5);  
-        flywheelSpeeds.put(4.9550, -46.75);
         flywheelSpeeds.put(1.6002, -33.0);
         flywheelSpeeds.put(2.3876, -36.0);
+        flywheelSpeeds.put(2.4638, -34.0);  
+        flywheelSpeeds.put(3.2766, -37.0);
+        flywheelSpeeds.put(3.7338, -39.75);
+        flywheelSpeeds.put(4.1148, -41.5); 
+        flywheelSpeeds.put(4.4196, -42.5);  
+        flywheelSpeeds.put(4.9550, -46.75);
+        
+        //Theortical Passing ones
+        flywheelSpeeds.put(5.5, -50.5);
+        flywheelSpeeds.put(6.0, -53.513);
+        flywheelSpeeds.put(6.5, -58.395);
+        flywheelSpeeds.put(7.0, -61.23);
+        flywheelSpeeds.put(7.5, -63.81);
+        flywheelSpeeds.put(8.0, -65.52010);
+        flywheelSpeeds.put(8.5, -66.45);
+        flywheelSpeeds.put(9.0, -67.267);
+
+
 
     }
 

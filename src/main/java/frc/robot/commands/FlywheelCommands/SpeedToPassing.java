@@ -30,7 +30,7 @@ public class SpeedToPassing extends Command {
 
   @Override
   public void execute() {
-    RobotContainer.shooting = true; 
+    //RobotContainer.shooting = true; 
     goal_speed = drive.calculateFlyWheelSpeedPassing(leftSide);
     flywheel.flywheelInterpNumber.set(goal_speed);
     // goal_speed = -41.5;

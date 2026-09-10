@@ -3,8 +3,6 @@ package frc.robot.commands.FlywheelCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Flywheel;
-import frc.robot.subsystems.Hood;
-import frc.robot.subsystems.Spindexer;
 
 public class DefaultFlywheel extends Command{
     
@@ -17,6 +15,8 @@ public class DefaultFlywheel extends Command{
     }
 
    public void execute(){
-        hood.getToSpeed(0);
+        RobotContainer.shooting = false; 
+        hood.stopMotors();
+        //WALLAHIIGOHGJPIEOIOIEGWOEGOEGOWEG:GW:GW:HWEG:HEGHUEGOHGTWHTGWGHUGTHUP
     }
 }

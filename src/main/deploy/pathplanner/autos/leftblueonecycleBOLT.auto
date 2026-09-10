@@ -11,9 +11,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "aravBlueLeft"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "aravBlueLeftBolt"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intake"
+                }
+              }
+            ]
           }
         },
         {
@@ -99,7 +112,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 3.0
+                  "waitTime": 30.0
                 }
               },
               {

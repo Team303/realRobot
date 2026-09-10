@@ -13,7 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "aravBlueLeft"
+            "pathName": "aravBlueLeftBolt"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ronaldLeftBlueBolt"
           }
         },
         {
@@ -111,7 +117,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 30.0
+                  "waitTime": 4.0
                 }
               },
               {
@@ -131,15 +137,193 @@
                       }
                     },
                     {
-                      "type": "named",
+                      "type": "sequential",
                       "data": {
-                        "name": "intake"
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "intake"
+                            }
+                          },
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 0.3
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Stop Intake"
+                            }
+                          }
+                        ]
                       }
                     }
                   ]
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Copy of BLPickupToBump"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "deadline",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 0.5
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Shoot2"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "intake"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "deadline",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 0.25
+                            }
+                          },
+                          {
+                            "type": "parallel",
+                            "data": {
+                              "commands": [
+                                {
+                                  "type": "named",
+                                  "data": {
+                                    "name": "Shoot1"
+                                  }
+                                },
+                                {
+                                  "type": "named",
+                                  "data": {
+                                    "name": "intake"
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "deadline",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 4.0
+                            }
+                          },
+                          {
+                            "type": "parallel",
+                            "data": {
+                              "commands": [
+                                {
+                                  "type": "named",
+                                  "data": {
+                                    "name": "Shoot1"
+                                  }
+                                },
+                                {
+                                  "type": "named",
+                                  "data": {
+                                    "name": "Shoot3"
+                                  }
+                                },
+                                {
+                                  "type": "sequential",
+                                  "data": {
+                                    "commands": [
+                                      {
+                                        "type": "named",
+                                        "data": {
+                                          "name": "intake"
+                                        }
+                                      },
+                                      {
+                                        "type": "wait",
+                                        "data": {
+                                          "waitTime": 0.3
+                                        }
+                                      },
+                                      {
+                                        "type": "named",
+                                        "data": {
+                                          "name": "Stop Intake"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "BLPickupToBump3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BLPickupToBump4"
           }
         }
       ]

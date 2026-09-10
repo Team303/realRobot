@@ -121,7 +121,7 @@ public final class Constants {
       public static final int TURRET_MOTOR_ID = 31; // NEED TO CHANGE
       public static final double TURRET_kS = 0.13;
       public static final double TURRET_kP = 80;
-      public static final double TURRET_kI = 0.0;
+      public static final double TURRET_kI = 0.01;
       public static final double TURRET_kD = 0.03;
       public static final double TURRET_kA = 0.0;
 
@@ -133,7 +133,7 @@ public final class Constants {
 
       public static final double TURRET_MOTOR_THROUGHBORE_RATIO = 2.8;
 
-      public static final double MAX_TURRET_ROTATION = 0.48;
+      public static final double MAX_TURRET_ROTATION = 0.53;
       public static final double HARD_MAX_TURRET_ROTATION = 0.5;
 
       public static final double TURRET_HOME_POS = 0;

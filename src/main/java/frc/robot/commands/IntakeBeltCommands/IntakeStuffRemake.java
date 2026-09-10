@@ -9,8 +9,7 @@ public class IntakeStuffRemake extends Command {
     boolean forward; 
     IntakeBelt intakeBelt;
 
-    public 
-    IntakeStuffRemake(IntakeBelt intakebelt, boolean forward) {
+    public IntakeStuffRemake(IntakeBelt intakebelt, boolean forward) {
         addRequirements(intakebelt);
         this.intakeBelt = intakebelt;
         this.forward = forward;

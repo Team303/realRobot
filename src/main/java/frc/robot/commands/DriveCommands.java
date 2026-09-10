@@ -78,12 +78,14 @@ public class DriveCommands {
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
 
+          double speedLimiter = 1.0;
+
           // Convert to field relative speeds & send command
           ChassisSpeeds speeds =
               new ChassisSpeeds(
-                  linearVelocity.getX() * (RobotContainer.shooting ? 3 : drive.getMaxLinearSpeedMetersPerSec()),
-                  linearVelocity.getY() * (RobotContainer.shooting ? 3 : drive.getMaxLinearSpeedMetersPerSec()),
-                  omega * drive.getMaxAngularSpeedRadPerSec());
+                  linearVelocity.getX() * (RobotContainer.shooting ? 2 : drive.getMaxLinearSpeedMetersPerSec() * speedLimiter),
+                  linearVelocity.getY() * (RobotContainer.shooting ? 2 : drive.getMaxLinearSpeedMetersPerSec() * speedLimiter),
+                  omega * (RobotContainer.shooting ? 3.5 : drive.getMaxAngularSpeedRadPerSec() * speedLimiter));
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;
